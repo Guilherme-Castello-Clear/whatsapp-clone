@@ -1,4 +1,7 @@
-class WhatsappController{
+import {Format} from './../util/Format.js';
+import {CameraController} from './CameraController.js';
+
+export class WhatsappController{
 
     constructor(){
         console.log("Running");
@@ -208,6 +211,7 @@ class WhatsappController{
         this.el.btnClosePanelCamera.on('click', e=> {
             this.el.panelMessagesContainer.show();
             this.el.panelCamera.removeClass('open');
+            this._camera.stop();
         })
 
         this.el.btnTakePicture.on('click', e=> {
