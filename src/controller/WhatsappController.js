@@ -1,5 +1,7 @@
 import {Format} from './../util/Format.js';
 import {CameraController} from './CameraController.js';
+import {DocumentPreviewController} from './DocumentPreviewController';
+
 
 export class WhatsappController{
 
@@ -248,7 +250,62 @@ export class WhatsappController{
             this.el.panelDocumentPreview.css({
                 'height': 'calc(100% - 120px)'
             })
-        })
+            this.el.inputDocument.click();
+        });
+
+        this.el.inputDocument.on('change', e => {
+
+            if(this.el.inputDocument.files.length){
+
+                this.el.panelDocumentPreview.css({
+                    'height': '1%'
+                })
+
+                let file = this.el.inputDocument.files[0];
+                
+                this._documentPreviewController = new DocumentPreviewController(file);
+                this._documentPreviewController.getPreviewData().then(result => {
+
+                    this.el.imgPanelDocumentPreview.src = result.src;
+                    this.el.infoPanelDocumentPreview.innerHTML = result.info;
+                    this.el.imagePanelDocumentPreview.show();
+                    this.el.filePanelDocumentPreview.hide();
+
+                    this.el.panelDocumentPreview.css({
+                        'height': 'calc(100% - 120px)'
+                    });
+
+                }).catch(err => {
+
+                    this.el.panelDocumentPreview.css({
+                        'height': 'calc(100% - 120px)'
+                    });
+                    console.log(file.type);
+                    switch(file.type){
+                        case 'application/zip':
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-generic';
+
+                            break;
+                        case 'application/vnd.debian.binary-package':
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-generic';
+
+                            break;
+
+                        default:
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-generic';
+                            break;
+                    }
+                    this.el.filenamePanelDocumentPreview.innerHTML = file.name;
+                    this.el.imagePanelDocumentPreview.hide();
+                    this.el.filePanelDocumentPreview.show();
+
+                });
+
+            }
+
+
+        });
+
 
         this.el.btnClosePanelDocumentPreview.on('click', e=> {
 
