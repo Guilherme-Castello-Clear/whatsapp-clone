@@ -24,7 +24,6 @@ export class User extends Model{
         return new Promise((s, f)=>{
 
             User.findByEmail(id).onSnapshot(doc => {
-                console.log("SNAP");
                 this.fromJSON(doc.data());
                 s(doc);
             })
