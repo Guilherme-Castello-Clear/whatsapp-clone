@@ -4,6 +4,7 @@ import {MicrophoneController} from './MicrophoneController.js';
 import {DocumentPreviewController} from './DocumentPreviewController';
 import { Firebase } from './../util/Firebase.js';
 import { User } from '../model/User.js';
+import { Chat } from './../model/Chat.js'
 
 export class WhatsappController{
 
@@ -127,6 +128,25 @@ export class WhatsappController{
                     img.show();
                 }
 
+                div.on('click',e => {
+
+
+                    console.log(contact.chatId);
+
+                    this.el.activeName.innerHTML = contact.name;
+                    this.el.activeStatus.innerHTML = contact.status;
+                    if(contact.photo){
+                        let img = this.el.activePhoto;
+                        img.src = contact.photo;
+                        img.show();
+                    }
+                    this.el.home.hide();
+                    this.el.main.css({
+                        display: 'flex'
+                    });
+
+                });
+
                 this.el.contactsMessagesList.appendChild(div);
             });
         });
@@ -242,10 +262,24 @@ export class WhatsappController{
 
             contact.on('datachange', data=>{
                 if(data.name){
-                    this._user.addContact(contact).then(()=>{
-                        console.info("ADICIONADO");
-                        this.el.btnClosePanelAddContact.click();
+                    Chat.createIfNotExists(this._user.email, contact.email).then(chat => {
+                        console.log(this._user)
+                        contact.chatId = chat.id;
+
+                        this._user.chatId = chat.id;
+                        contact.addContact(this._user);
+
+                        this._user.addContact(contact).then(()=>{
+                            console.info("ADICIONADO");
+                            this.el.btnClosePanelAddContact.click();
+                        }).catch(err => {
+                            console.error(err);
+                        });;
+                    }).catch(err => {
+                        console.error(err);
                     });
+
+                    
                 }else{
                     console.error('Usuario não foi encontrado')
                 }
