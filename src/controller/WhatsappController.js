@@ -292,6 +292,18 @@ export class WhatsappController{
     initEvents(){
 
 
+        this.el.inputSearchContacts.on('keyup', e=> {
+            
+            if(this.el.inputSearchContacts.value.length > 0){
+                this.el.inputSearchContactsPlaceholder.hide();
+            }
+            else{
+                this.el.inputSearchContactsPlaceholder.show();
+            }
+            this._user.getContacts(this.el.inputSearchContacts.value);
+
+        })
+
         //START ADD CONTACT        
         this.el.btnNewContact.on("click", e => {
             this.closeAllLeftPanel();
@@ -317,7 +329,6 @@ export class WhatsappController{
             contact.on('datachange', data=>{
                 if(data.name){
                     Chat.createIfNotExists(this._user.email, contact.email).then(chat => {
-                        console.log(this._user)
                         contact.chatId = chat.id;
 
                         this._user.chatId = chat.id;
@@ -410,9 +421,7 @@ export class WhatsappController{
 
         this.el.inputPhoto.on('change', e => {
 
-            console.log(this.el.inputPhoto.files);
             [...this.el.inputPhoto.files].forEach(file => {
-                console.log(file);
             });
 
         })
@@ -442,7 +451,6 @@ export class WhatsappController{
 
         this.el.btnTakePicture.on('click', e=> {
             let dataUrl = this._camera.takePicture();
-            console.log(dataUrl);
             this.el.pictureCamera.src = dataUrl;
             this.el.pictureCamera.show();
             this.el.videoCamera.hide();
@@ -504,7 +512,6 @@ export class WhatsappController{
                     this.el.panelDocumentPreview.css({
                         'height': 'calc(100% - 120px)'
                     });
-                    console.log(file.type);
                     switch(file.type){
                         case 'application/zip':
                             this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-generic';
