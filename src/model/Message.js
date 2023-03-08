@@ -1,5 +1,6 @@
 import { Model } from './Model'
 import { Firebase } from "../util/Firebase";
+import { Format } from "../util/Format";
 
 
 export class Message extends Model{
@@ -7,6 +8,10 @@ export class Message extends Model{
     constructor(){
         super();
     }
+
+
+    get id(){ return this._data.id}
+    set id(value){ return this._data.id = value;}
 
     get content(){ return this._data.content}
     set content(value){ return this._data.content = value;}
@@ -28,7 +33,7 @@ export class Message extends Model{
 
         switch(this.type){
             case 'contact':
-                div.innerHRML = `
+                div.innerHTML = `
                     <div class="_3_7SH kNKwo tail">
                         <span class="tail-container"></span>
                         <span class="tail-container highlight"></span>
@@ -127,7 +132,7 @@ export class Message extends Model{
                 break;
                 
             case 'document':
-                div.innerHRML = `
+                div.innerHTML = `
     
                 <div class="_3_7SH _1ZPgd">
                     <div class="_1fnMt _2CORf">
@@ -177,7 +182,7 @@ export class Message extends Model{
                 break;
 
             case 'audio':
-                div.innerHRML = `    
+                div.innerHTML = `    
                     <div class="_3_7SH _17oKL">
                         <div class="_2N_Df LKbsn">
                             <div class="_2jfIu">
@@ -263,24 +268,29 @@ export class Message extends Model{
                 break;
 
             default:
-                div.innerHRML = `
-                    <div class="font-style _3DFk6 tail">
+                div.innerHTML = `
+                    <div class="font-style _3DFk6 tail" id="_${this.id}">
                         <span class="tail-container"></span>
                         <span class="tail-container highlight"></span>
                         <div class="Tkt2p">
                             <div class="_3zb-j ZhF0n">
-                                <span dir="ltr" class="selectable-text invisible-space message-text">Oi!</span>
+                                <span dir="ltr" class="selectable-text invisible-space message-text">${this.content}</span>
                             </div>
                             <div class="_2f-RV">
                                 <div class="_1DZAH">
-                                    <span class="msg-time">11:33</span>
+                                    <span class="msg-time">${Format.timeStampToTime(this.timeStamp)}</span>
                                 </div>
                             </div>
                         </div>
-                    </div>`
+                    </div>`;
                 break;
         }
-        let className = (me) ? 'message-out' : 'message-in';
+        let className = 'message-in';
+
+        if(me){
+            className = 'message-out'
+        }
+
         div.firstElementChild.classList.add(className);
 
         return div;
@@ -303,5 +313,8 @@ export class Message extends Model{
         return Firebase.db().collection('chats').doc(chatId).collection('messages');
 
     }
+
+
+
 
 }

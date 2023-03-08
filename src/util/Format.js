@@ -21,4 +21,18 @@ export class Format{
         }
     }
 
+
+    static timeStampToTime(timeStamp){
+
+        return (timeStamp && typeof timeStamp.toDate === 'function') ? Format.dateToTime(timeStamp.toDate()) : '';
+
+    }
+
+    static dateToTime(date,locale = "pt-BR"){
+        return date.toLocaleTimeString(this._locale, {
+            hours: '2-digit',
+            minutes: '2-digit'
+        });
+    }
+
 }
