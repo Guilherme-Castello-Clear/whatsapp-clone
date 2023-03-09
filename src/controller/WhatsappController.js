@@ -6,6 +6,8 @@ import { Firebase } from './../util/Firebase.js';
 import { User } from '../model/User.js';
 import { Chat } from './../model/Chat.js'
 import { Message } from './../model/Message.js'
+import { Base64} from "../util/Base64";
+
 
 export class WhatsappController{
 
@@ -602,7 +604,33 @@ export class WhatsappController{
         });
 
         this.el.btnSendDocument.on('click', e => {
-            console.log('send document');
+
+
+            let file = this.el.inputDocument.files[0];
+            let base64 = this.el.imgPanelDocumentPreview.src;
+
+            if(file.type === 'application/pdf'){
+
+
+                Base64.toFile(base64).then(filePreview => {
+                    Message.sendDocument(
+                        this._contactActive.chatId,
+                        this._user.email,
+                        file,
+                        filePreview,
+                        this.el.infoPanelDocumentPreview.innerHTML);
+                });
+
+            }
+            else{
+
+                Message.sendDocument(this._contactActive.chatId, this._user.email, file);
+
+            }
+
+            this.el.btnClosePanelDocumentPreview.click();
+        
+
         })
 
         //END ATTACH DOCUMENT
