@@ -52,6 +52,7 @@ export class Message extends Model{
 
         let div = document.createElement('div');
         div.className = 'message';
+        div.id = `_${this.id}`;
 
         switch(this.type){
             case 'contact':
@@ -77,7 +78,7 @@ export class Message extends Model{
                                     </div>
                                 </div>
                                 <div class="_1lC8v">
-                                    <div dir="ltr" class="_3gkvk selectable-text invisible-space copyable-text">Nome do Contato Anexado</div>
+                                    <div dir="ltr" class="_3gkvk selectable-text invisible-space copyable-text">${this.content.name}</div>
                                 </div>
                                 <div class="_3a5-b">
                                     <div class="_1DZAH" role="button">
@@ -90,6 +91,14 @@ export class Message extends Model{
                                 <div class="btn-message-send" role="button">Enviar mensagem</div>
                             </div>
                         </div>`
+
+                    if(this.content.photo){
+                        let img = div.querySelector('.photo-contact-sended');
+                        img.src = this.content.photo;
+                        img.show();
+                    }
+
+                    
                 break;
 
             case 'image':
@@ -279,7 +288,7 @@ export class Message extends Model{
 
             default:
                 div.innerHTML = `
-                    <div class="font-style _3DFk6 tail" id="_${this.id}">
+                    <div class="font-style _3DFk6 tail">
                         <span class="tail-container"></span>
                         <span class="tail-container highlight"></span>
                         <div class="Tkt2p">
@@ -323,7 +332,6 @@ export class Message extends Model{
                 }, {
                     merge:true
                 }).then(() => {
-                    console.log('SEND END')
                     s(docRef);
                 });
             });
@@ -343,7 +351,6 @@ export class Message extends Model{
 
 
         Message.send(chatId, from, 'document', '').then(msgRef =>{
-                console.log(msgRef)
                 Message.upload(file, from).then(downloadURL => {
                     
                     let downloadFile = downloadURL;
@@ -493,6 +500,10 @@ export class Message extends Model{
         
         return div;
 
+    }
+
+    static sendContact(chatId, from, contact){
+        return Message.send(chatId, from, 'contact', contact);
     }
 
 

@@ -7,6 +7,7 @@ import { User } from '../model/User.js';
 import { Chat } from './../model/Chat.js'
 import { Message } from './../model/Message.js'
 import { Base64} from "../util/Base64";
+import { ContactsController } from './ContactsController.js';
 
 
 export class WhatsappController{
@@ -187,6 +188,7 @@ export class WhatsappController{
                 let message = new Message();
                 message.fromJSON(data);
                 let me = (data.from === this._user.email);
+                let view = message.getViewElement(me);
 
                 if(!this.el.panelMessagesContainer.querySelector('#_'+data.id)){
 
@@ -199,7 +201,6 @@ export class WhatsappController{
                             merge:true
                         });
                     }
-                    let view = message.getViewElement(me);
 
                     this.el.panelMessagesContainer.appendChild(view);
 
@@ -208,6 +209,31 @@ export class WhatsappController{
                     let msgEl = this.el.panelMessagesContainer.querySelector('#_'+data.id)
                     msgEl.querySelector('.message-status').innerHTML = message.getStatusViewElement().outerHTML;
                 }
+
+                if(message.type === 'contact'){
+                    view.querySelector('.btn-message-send').on('click', e=>{
+                        Chat.createIfNotExists(this._user.email, message.content.email).then(chat => {
+                            
+                            let contact = new User(message.content.email);
+                            contact.on('datachange', data => {
+                                
+                                contact.chatId = chat.id;
+                                this._user.addContact(contact);
+
+                                this._user.chatId = chat.id;
+                                contact.addContact(this._user);
+        
+                                this.setActiveChat(contact);
+                            })
+
+
+                        })
+                            
+                            
+                    });
+                }
+                
+
             })
             if(autoScroll){
 
@@ -638,12 +664,22 @@ export class WhatsappController{
         //START ATTACH CONTACT
 
         this.el.btnAttachContact.on('click', e=>{
-            this.el.modalContacts.show();
+            this._contactsController = new ContactsController(this.el.modalContacts, this._user);
+            this._contactsController.on('select', contact => {
+
+                Message.sendContact(
+                    this._contactActive.chatId,
+                    this._user.email,
+                    contact);
+
+
+            })
+            this._contactsController.open();
         })
 
 
         this.el.btnCloseModalContacts.on('click', e => {
-            this.el.modalContacts.hide();
+            this._contactsController.close();
         })
 
         //END ATTACH CONTACT
