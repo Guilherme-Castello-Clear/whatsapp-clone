@@ -713,6 +713,19 @@ export class WhatsappController{
         })
 
         this.el.btnFinishMicrophone.on('click', e=> {
+
+
+            this.microphoneController.on('recorded', (file, metadata) => {
+                console.log("Retornado")
+                Message.sendAudio(
+                    this._contactActive.chatId,
+                    this._user.email,
+                    file,
+                    metadata,
+                    this._user.photo
+                );
+
+            })
             this.microphoneController.stopRecorder();
             this.closeRecordMicrophone();
             
